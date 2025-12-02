@@ -97,7 +97,7 @@ export default defineComponent({
 <template>
   <div>
     <sortable-table
-      key-field="description"
+      key-field="id"
       :loading="loading"
       :headers="headers"
       :rows="installedExtensions"
