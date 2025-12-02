@@ -121,6 +121,7 @@ chirico
 cidata
 cidfile
 Cim
+claude
 clickable
 clientcmd
 clientset
@@ -317,6 +318,7 @@ googleoauth
 gopacket
 gosec
 GOTOOLCHAIN
+gotchas
 govet
 gpg
 gpu
@@ -867,6 +869,7 @@ Unauthed
 UNCONFIGURED
 unexpose
 unexposing
+uninstallation
 unmarshaling
 unparsable
 unregistering
