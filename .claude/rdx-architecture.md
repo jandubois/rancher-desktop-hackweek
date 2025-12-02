@@ -129,6 +129,18 @@ protected extensions: Record<string, Record<string, ExtensionImpl>> = {};
 
 **Fix:** Clear all memoized caches in `uninstall()` before returning.
 
+### Installed Tab Uninstall Button Not Working (Fixed)
+
+**Problem:** In `installed.vue`, the SortableTable used `key-field="description"` but `ExtensionState` doesn't have a `description` field. This caused all rows to have `undefined` as their Vue key, breaking Vue's reactivity and event handling.
+
+**Fix:** Change `key-field` to `"id"` which is the unique identifier in `ExtensionState`.
+
+**Key UI Files:**
+- `pkg/rancher-desktop/pages/extensions/installed.vue` - Installed tab
+- `pkg/rancher-desktop/components/MarketplaceCard.vue` - Catalog cards
+
+**ExtensionState fields:** `id`, `version`, `metadata`, `labels`, `availableVersion`, `canUpgrade`
+
 ### Container Namespace
 
 Extensions use a dedicated namespace: `rancher-desktop-extensions`
