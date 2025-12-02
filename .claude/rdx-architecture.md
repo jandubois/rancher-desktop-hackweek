@@ -141,6 +141,22 @@ protected extensions: Record<string, Record<string, ExtensionImpl>> = {};
 
 **ExtensionState fields:** `id`, `version`, `metadata`, `labels`, `availableVersion`, `canUpgrade`
 
+### ddClient.extension Missing id and version Fields (Fixed)
+
+**Problem:** The `ddClient.extension` object provided to extensions only had the `image` field set to the extension ID (without version). The `id` and `version` fields were missing entirely. According to Docker Desktop API:
+- `image` should be `id:version` (full image reference)
+- `id` should be the image name without tag
+- `version` should be just the tag
+
+**Fix:**
+1. In `window/index.ts`, look up extension version from settings
+2. Pass `extensionId` and `extensionVersion` to preload script via `additionalArguments`
+3. Update `RDXClient` constructor to set all three fields properly
+
+**Key Files:**
+- `pkg/rancher-desktop/window/index.ts` - Creates WebContentsView and passes extension info
+- `pkg/rancher-desktop/preload/extensions.ts` - Defines `RDXClient` and `ddClient.extension`
+
 ### Container Namespace
 
 Extensions use a dedicated namespace: `rancher-desktop-extensions`
