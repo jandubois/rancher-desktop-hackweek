@@ -364,7 +364,7 @@ export class RDXClient implements v1.DockerDesktopClient {
     Object.assign(this.host, { arch: info.arch, hostname: info.hostname });
     // Update extension info with id and version if provided
     if (info.extensionId) {
-      this.extension.image = info.extensionVersion ? `${ info.extensionId }:${ info.extensionVersion }` : info.extensionId;
+      (this.extension as any).image = info.extensionVersion ? `${ info.extensionId }:${ info.extensionVersion }` : info.extensionId;
       (this.extension as any).id = info.extensionId;
       (this.extension as any).version = info.extensionVersion ?? '';
     }
