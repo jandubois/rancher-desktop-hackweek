@@ -319,6 +319,7 @@ gopacket
 gosec
 GOTOOLCHAIN
 gotchas
+Gotchas
 govet
 gpg
 gpu
@@ -870,6 +871,7 @@ UNCONFIGURED
 unexpose
 unexposing
 uninstallation
+Uninstallation
 unmarshaling
 unparsable
 unregistering
