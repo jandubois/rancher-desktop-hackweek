@@ -360,8 +360,12 @@ ipcRenderer.on('extensions/spawn/close', (_, id, returnValue) => {
 // During the nuxt removal, import/namespace started failing
 
 export class RDXClient implements v1.DockerDesktopClient {
-  constructor(info: { arch: string, hostname: string }) {
-    Object.assign(this.host, info);
+  constructor(info: { arch: string, hostname: string, extensionVersion?: string }) {
+    Object.assign(this.host, { arch: info.arch, hostname: info.hostname });
+    if (info.extensionVersion) {
+      this.extension.image = `${ extensionId }:${ info.extensionVersion }`;
+      this.extension.version = info.extensionVersion;
+    }
   }
 
   /**
@@ -412,7 +416,7 @@ export class RDXClient implements v1.DockerDesktopClient {
     }
   }
 
-  extension: v1.Extension = {
+  extension: v1.Extension & { id?: string, version?: string } = {
     vm: {
       cli:     { exec: getExec('container') },
       service: {
@@ -425,8 +429,10 @@ export class RDXClient implements v1.DockerDesktopClient {
         head:    (url: string) => this.makeRequest('HEAD', url),
       },
     },
-    host:  { cli: { exec: getExec('host') } },
-    image: extensionId,
+    host:    { cli: { exec: getExec('host') } },
+    image:   extensionId,
+    id:      extensionId,
+    version: '',
   };
 
   desktopUI = {
