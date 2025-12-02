@@ -157,6 +157,13 @@ protected extensions: Record<string, Record<string, ExtensionImpl>> = {};
 - `pkg/rancher-desktop/window/index.ts` - Creates WebContentsView and passes extension info
 - `pkg/rancher-desktop/preload/extensions.ts` - Defines `RDXClient` and `ddClient.extension`
 
+**TypeScript Note:** The `v1.Extension` type from `@docker/extension-api-client-types` defines `image`, `id`, and other properties as `readonly`. To modify them at runtime, cast `this.extension` to `any` before assignment:
+```typescript
+(this.extension as any).image = ...;
+(this.extension as any).id = ...;
+(this.extension as any).version = ...;
+```
+
 ### Container Namespace
 
 Extensions use a dedicated namespace: `rancher-desktop-extensions`
