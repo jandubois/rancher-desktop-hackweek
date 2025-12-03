@@ -26,7 +26,7 @@ interface ComposeFile {
   name?:    string;
   services: Record<string, {
     image?:       string;
-    environment?: string[];
+    environment?: string[] | Record<string, string>;
     command?:     string;
     volumes?: (string | {
       type:       string;
@@ -494,9 +494,12 @@ export class ExtensionImpl implements Extension {
     // Add DESKTOP_PLUGIN_IMAGE environment variable to all services
     // so it's available inside the running containers
     for (const service of Object.values(contents.services)) {
-      service.environment ??= {};
-      if (typeof service.environment === 'object' && !Array.isArray(service.environment)) {
+      if (Array.isArray(service.environment)) {
+        service.environment.push(`DESKTOP_PLUGIN_IMAGE=${ this.image }`);
+      } else if (service.environment) {
         service.environment.DESKTOP_PLUGIN_IMAGE = this.image;
+      } else {
+        service.environment = { DESKTOP_PLUGIN_IMAGE: this.image };
       }
     }
 
