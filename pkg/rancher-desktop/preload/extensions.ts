@@ -360,8 +360,14 @@ ipcRenderer.on('extensions/spawn/close', (_, id, returnValue) => {
 // During the nuxt removal, import/namespace started failing
 
 export class RDXClient implements v1.DockerDesktopClient {
-  constructor(info: { arch: string, hostname: string }) {
-    Object.assign(this.host, info);
+  constructor(info: { arch: string, hostname: string, extensionId?: string, extensionVersion?: string }) {
+    Object.assign(this.host, { arch: info.arch, hostname: info.hostname });
+    // Update extension info with id and version if provided
+    if (info.extensionId) {
+      (this.extension as any).image = info.extensionVersion ? `${ info.extensionId }:${ info.extensionVersion }` : info.extensionId;
+      (this.extension as any).id = info.extensionId;
+      (this.extension as any).version = info.extensionVersion ?? '';
+    }
   }
 
   /**

@@ -50,8 +50,9 @@ export default defineComponent({
     emptyStateBody(): string {
       return this.t('extensions.installed.emptyState.body', { }, true);
     },
-    ...mapGetters('extensions', ['installedExtensions']) as {
-      installedExtensions: () => ExtensionState[],
+    // Use regularExtensions to exclude the welcome extension from the list
+    ...mapGetters('extensions', ['regularExtensions']) as {
+      regularExtensions: () => ExtensionState[],
     },
   },
   async beforeMount() {
@@ -69,11 +70,13 @@ export default defineComponent({
       return ext.labels?.['org.opencontainers.image.title'] ?? ext.id;
     },
     async uninstall(installed: ExtensionState) {
-      this.$set(this.busy, installed.id, true);
+      this.busy = { ...this.busy, [installed.id]: true };
       try {
         await this.$store.dispatch('extensions/uninstall', { id: installed.id });
       } finally {
-        this.$delete(this.busy, installed.id);
+        const { [installed.id]: _, ...rest } = this.busy;
+
+        this.busy = rest;
       }
     },
     async upgrade(installed: ExtensionState) {
@@ -83,11 +86,13 @@ export default defineComponent({
         // Should not have reached here.
         return;
       }
-      this.$set(this.busy, installed.id, true);
+      this.busy = { ...this.busy, [installed.id]: true };
       try {
         await this.$store.dispatch('extensions/install', { id });
       } finally {
-        this.$delete(this.busy, installed.id);
+        const { [installed.id]: _, ...rest } = this.busy;
+
+        this.busy = rest;
       }
     },
   },
@@ -97,10 +102,10 @@ export default defineComponent({
 <template>
   <div>
     <sortable-table
-      key-field="description"
+      key-field="id"
       :loading="loading"
       :headers="headers"
-      :rows="installedExtensions"
+      :rows="regularExtensions"
       :search="false"
       :table-actions="false"
       :row-actions="false"
@@ -146,14 +151,14 @@ export default defineComponent({
             <button
               v-if="!busy[row.id] && row.canUpgrade"
               class="btn btn-sm role-primary"
-              @click="upgrade(row)"
+              @click.stop="upgrade(row)"
             >
               {{ t('extensions.installed.list.upgrade') }}
             </button>
             <button
               :disabled="busy[row.id]"
               class="btn btn-sm role-danger"
-              @click="uninstall(row)"
+              @click.stop="uninstall(row)"
             >
               {{ t('extensions.installed.list.uninstall') }}
             </button>

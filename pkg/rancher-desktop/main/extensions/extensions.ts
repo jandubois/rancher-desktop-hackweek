@@ -491,6 +491,15 @@ export class ExtensionImpl implements Extension {
       }
     }
 
+    // Add DESKTOP_PLUGIN_IMAGE environment variable to all services
+    // so it's available inside the running containers
+    for (const service of Object.values(contents.services)) {
+      service.environment ??= {};
+      if (typeof service.environment === 'object' && !Array.isArray(service.environment)) {
+        service.environment.DESKTOP_PLUGIN_IMAGE = this.image;
+      }
+    }
+
     // Write out the modified compose file, either clobbering the original or
     // using the preferred name and shadowing the original.
     await fs.promises.writeFile(path.join(composeDir, 'compose.yaml'), JSON.stringify(contents));
@@ -548,12 +557,28 @@ export class ExtensionImpl implements Extension {
       }
     }
 
+    // Clear memoized caches so that if the extension is reinstalled, fresh
+    // metadata will be extracted from the Docker image.
+    this._metadata = undefined;
+    this._labels = undefined;
+    this._iconName = undefined;
+    this._composeFile = undefined;
+    this._composeName = '';
+
     mainEvents.emit('settings-write', { application: { extensions: { installed: { [this.id]: undefined } } } });
 
     return true;
   }
 
   protected async uninstallContainers() {
+    const metadata = await this.metadata;
+
+    if (!isVMTypeImage(metadata.vm) && !isVMTypeComposefile(metadata.vm)) {
+      console.debug(`Extension ${ this.id } does not have containers to stop.`);
+
+      return;
+    }
+
     console.debug(`Running ${ this.id } compose down`);
     await this.client.composeDown({
       composeDir: path.join(this.dir, 'compose'),
