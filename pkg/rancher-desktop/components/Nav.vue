@@ -10,7 +10,7 @@
         :id="`extension:${welcomeExtensionWithUI.id}`"
         class="welcome-extension"
       >
-        <template #before>
+        <template #after>
           <nav-icon-extension :extension-id="welcomeExtensionWithUI.id" />
         </template>
         {{ welcomeExtensionWithUI.metadata.ui['dashboard-tab'].title }}
